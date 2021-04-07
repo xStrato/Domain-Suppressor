@@ -1,0 +1,21 @@
+{
+  "name": "Domain-Suppressor",
+  "version": "0.1.0",
+  "description": "",
+  "main": "background.js",
+  "scripts": {
+    "start": "tsc -w"
+  },
+  "keywords": [
+    "Domain Suppressor",
+    "url suppressor",
+    "url blocking",
+    "url",
+    "block"
+  ],
+  "author": "xStrato",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chrome": "^0.0.134"
+  }
+}
