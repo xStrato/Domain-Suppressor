@@ -17,7 +17,7 @@ chrome.tabs.onActivated.addListener(tab =>
         chrome.cookies.get({
             name: "suppress_execution",
             url: BLOCK_URL
-        }, (data) => suppressorOnActivated(tab.tabId, data?.value))
+        }, (data) => suppressOnActivated(tab.tabId, data?.value))
     } 
     catch (error)
     {
@@ -33,7 +33,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) =>
         chrome.cookies.get({
             name: "suppress_execution", 
             url: BLOCK_URL}, 
-            (data) => suppressorOnUpdated(tab, data?.value))
+            (data) => suppressOnUpdated(tab, data?.value))
     }
     catch (error) 
     {
@@ -41,7 +41,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) =>
     }
 });
 
-function suppressorOnUpdated(tab:chrome.tabs.Tab, executionStatus?: string): void
+function suppressOnUpdated(tab:chrome.tabs.Tab, executionStatus?: string): void
 {
     if (executionStatus==="active")
     {
@@ -55,7 +55,7 @@ function suppressorOnUpdated(tab:chrome.tabs.Tab, executionStatus?: string): voi
     }
 }
 
-function suppressorOnActivated(tabId:number, executionStatus?:string): void
+function suppressOnActivated(tabId:number, executionStatus?:string): void
 {
     if (executionStatus==="active")
     {
