@@ -1,7 +1,7 @@
-const YOU_CUSTOM_TAG: string = "[name='my-custom-tag']"
-
-const INJECT_CODE: string = `document.querySelector("${YOU_CUSTOM_TAG}")?.name`;
 const MY_PROCESS_NAME: string = "my-custom-tag";
+
+const YOU_CUSTOM_TAG: string = `[name='${MY_PROCESS_NAME}']`
+const INJECT_CODE: string = `document.querySelector("${YOU_CUSTOM_TAG}")?.name`;
 const BLOCK_URL: string = "https://www.google.com/";
 
 chrome.cookies.set({
@@ -41,13 +41,13 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) =>
     }
 });
 
-function suppressOnUpdated(tab:chrome.tabs.Tab, executionStatus?: string): void
+function suppressOnUpdated(tab:chrome.tabs.Tab, executionStatus?:string): void
 {
     if (executionStatus==="active")
     {
-        chrome.tabs.executeScript(tab.id!, { code: INJECT_CODE }, (result) => 
+        chrome.tabs.executeScript(tab.id!, { code: INJECT_CODE }, (executionResult) => 
         {
-            if (!result?.includes(MY_PROCESS_NAME) && tab.url?.includes(BLOCK_URL))
+            if (!executionResult?.includes(MY_PROCESS_NAME) && tab.url?.includes(BLOCK_URL))
             {
                 chrome.tabs.remove(tab.id!);
             }
