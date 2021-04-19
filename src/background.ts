@@ -1,12 +1,12 @@
-const MY_PROCESS_NAME: string = "my-custom-tag";
+const MY_PROCESS_NAME = "my-custom-tag";
 
-const YOU_CUSTOM_TAG: string = `[name='${MY_PROCESS_NAME}']`
-const INJECT_CODE: string = `document.querySelector("${YOU_CUSTOM_TAG}")?.name`;
-const BLOCK_URL: string = "https://www.google.com/";
+const YOU_CUSTOM_TAG = `[name='${MY_PROCESS_NAME}']`
+const INJECT_CODE = `document.querySelector("${YOU_CUSTOM_TAG}")?.name`;
+const BLOCK_URLS = ["https://www.google.com/", "https://github.com/"];
 
 chrome.cookies.set({
     name: "suppress_execution", 
-    url: BLOCK_URL,
+    url:BLOCK_URLS[0],
     value: "inactive"
 })
 
@@ -14,10 +14,12 @@ chrome.tabs.onActivated.addListener(tab =>
 {
     try 
     {
-        chrome.cookies.get({
-            name: "suppress_execution",
-            url: BLOCK_URL
-        }, (data) => suppressOnActivated(tab.tabId, data?.value))
+        BLOCK_URLS.forEach(url => {
+            chrome.cookies.get({
+                name: "suppress_execution",
+                url
+            }, (data) => suppressOnActivated(tab.tabId, data?.value))
+        });
     } 
     catch (error)
     {
@@ -30,10 +32,12 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) =>
 {
     try 
     {
-        chrome.cookies.get({
-            name: "suppress_execution", 
-            url: BLOCK_URL}, 
-            (data) => suppressOnUpdated(tab, data?.value))
+        BLOCK_URLS.forEach(url => {
+            chrome.cookies.get({
+                name: "suppress_execution",
+                url
+            }, (data) => suppressOnUpdated(tab, data?.value))
+        });
     }
     catch (error) 
     {
@@ -43,14 +47,17 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) =>
 
 function suppressOnUpdated(tab:chrome.tabs.Tab, executionStatus?:string): void
 {
+    console.log(tab, executionStatus);
     if (executionStatus==="active")
     {
         chrome.tabs.executeScript(tab.id!, { code: INJECT_CODE }, (executionResult) => 
         {
-            if (!executionResult?.includes(MY_PROCESS_NAME) && tab.url?.includes(BLOCK_URL))
-            {
-                chrome.tabs.remove(tab.id!);
-            }
+            BLOCK_URLS.forEach(url => {
+                if (!executionResult?.includes(MY_PROCESS_NAME) && tab.url?.includes(url))
+                {
+                    chrome.tabs.remove(tab.id!);
+                }
+            });
         });
     }
 }
@@ -63,11 +70,12 @@ function suppressOnActivated(tabId:number, executionStatus?:string): void
         {
             chrome.tabs.get(tabId, tabInfo => 
             {
-                if (!executionResult?.includes(MY_PROCESS_NAME) && 
-                    tabInfo.url?.includes(BLOCK_URL))
-                {
-                    setTimeout(() => chrome.tabs.remove(tabId), 500);
-                } 
+                BLOCK_URLS.forEach(url => {
+                    if (!executionResult?.includes(MY_PROCESS_NAME) && tabInfo.url?.includes(url))
+                    {
+                        setTimeout(() => chrome.tabs.remove(tabId), 500);
+                    } 
+                });
             });
         });
     }
